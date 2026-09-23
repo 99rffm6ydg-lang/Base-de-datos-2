@@ -36,6 +36,7 @@
     <nav class="bg-slate-800/80 border-b border-slate-700 p-2 overflow-x-auto no-scrollbar flex space-x-2">
         <button onclick="switchTab('inicio')" id="tab-inicio" class="tab-btn bg-sky-600 text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors">Inicio</button>
         <button onclick="switchTab('remision-cartaporte')" id="tab-remision-cartaporte" class="tab-btn bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-slate-600 transition-colors">Remisión / Carta Porte</button>
+        <button onclick="switchTab('mantenimiento')" id="tab-mantenimiento" class="tab-btn bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-slate-600 transition-colors">Mantenimiento</button>
         <button onclick="switchTab('pendientes')" id="tab-pendientes" class="tab-btn bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-slate-600 transition-colors">Pendientes</button>
         <button onclick="switchTab('compras')" id="tab-compras" class="tab-btn bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-slate-600 transition-colors">Compras</button>
         <button onclick="switchTab('choferes')" id="tab-choferes" class="tab-btn bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-slate-600 transition-colors">Choferes</button>
@@ -49,70 +50,88 @@
         <section id="sec-inicio" class="content-sec space-y-4">
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
                 <h2 class="text-lg font-semibold text-sky-400 mb-2">Panel General</h2>
-                <p class="text-sm text-slate-400">Selecciona una de las opciones del menú superior para registrar camiones, choferes o generar nuevas Remisiones y Cartas Porte.</p>
+                <p class="text-sm text-slate-400">Selecciona una opción del menú para administrar la flota, mantenimientos, pendientes o compras.</p>
             </div>
             
             <div class="grid grid-cols-2 gap-3">
                 <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                    <p class="text-xs text-slate-400 font-medium">Camiones Registrados</p>
+                    <p class="text-xs text-slate-400 font-medium">Camiones</p>
                     <p id="count-camiones" class="text-2xl font-bold text-white mt-1">0</p>
                 </div>
                 <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                    <p class="text-xs text-slate-400 font-medium">Choferes Registrados</p>
+                    <p class="text-xs text-slate-400 font-medium">Choferes</p>
                     <p id="count-choferes" class="text-2xl font-bold text-white mt-1">0</p>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                    <p class="text-xs text-slate-400 font-medium">Mantenimientos</p>
+                    <p id="count-mantenimiento" class="text-2xl font-bold text-sky-400 mt-1">0</p>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                    <p class="text-xs text-slate-400 font-medium">Pendientes Activos</p>
+                    <p id="count-pendientes" class="text-2xl font-bold text-amber-400 mt-1">0</p>
                 </div>
             </div>
         </section>
 
         <!-- TAB: REGISTRO DE CAMIONES -->
         <section id="sec-camiones" class="content-sec hidden space-y-4">
-            <form onsubmit="agregarCamion(event)" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <h2 class="text-lg font-semibold text-sky-400 mb-1">Registrar Camión</h2>
+            <form onsubmit="guardarCamion(event)" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                <h2 id="form-camion-title" class="text-lg font-semibold text-sky-400 mb-1">Registrar Camión</h2>
+                <input type="hidden" id="camion-index" value="-1">
                 <input type="text" id="camion-eco" placeholder="Número Eco" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-sky-500">
                 <input type="text" id="camion-placas" placeholder="Placas" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-sky-500">
                 <input type="text" id="camion-modelo" placeholder="Modelo / Marca" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-sky-500">
-                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 font-medium py-2.5 rounded-lg text-sm text-white transition-colors">Guardar Camión</button>
+                
+                <div class="flex gap-2">
+                    <button type="submit" id="btn-camion-submit" class="flex-1 bg-sky-600 hover:bg-sky-500 font-medium py-2.5 rounded-lg text-sm text-white transition-colors">Guardar Camión</button>
+                    <button type="button" id="btn-camion-cancel" onclick="cancelarEdicionCamion()" class="hidden bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-lg text-sm text-slate-300">Cancelar</button>
+                </div>
             </form>
+
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
                 <h3 class="text-sm font-semibold text-slate-300 mb-2">Lista de Camiones</h3>
-                <ul id="lista-camiones" class="divide-y divide-slate-700 text-sm text-slate-300"></ul>
+                <div id="lista-camiones" class="space-y-2"></div>
             </div>
         </section>
 
         <!-- TAB: REGISTRO DE CHOFERES -->
         <section id="sec-choferes" class="content-sec hidden space-y-4">
-            <form onsubmit="agregarChofer(event)" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <h2 class="text-lg font-semibold text-sky-400 mb-1">Registrar Chofer</h2>
+            <form onsubmit="guardarChofer(event)" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                <h2 id="form-chofer-title" class="text-lg font-semibold text-sky-400 mb-1">Registrar Chofer</h2>
+                <input type="hidden" id="chofer-index" value="-1">
                 <input type="text" id="chofer-nombre" placeholder="Nombre Completo" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-sky-500">
                 <input type="text" id="chofer-licencia" placeholder="Número de Licencia" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-sky-500">
-                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 font-medium py-2.5 rounded-lg text-sm text-white transition-colors">Guardar Chofer</button>
+                
+                <div class="flex gap-2">
+                    <button type="submit" id="btn-chofer-submit" class="flex-1 bg-sky-600 hover:bg-sky-500 font-medium py-2.5 rounded-lg text-sm text-white transition-colors">Guardar Chofer</button>
+                    <button type="button" id="btn-chofer-cancel" onclick="cancelarEdicionChofer()" class="hidden bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-lg text-sm text-slate-300">Cancelar</button>
+                </div>
             </form>
+
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
                 <h3 class="text-sm font-semibold text-slate-300 mb-2">Lista de Choferes</h3>
-                <ul id="lista-choferes" class="divide-y divide-slate-700 text-sm text-slate-300"></ul>
+                <div id="lista-choferes" class="space-y-2"></div>
             </div>
         </section>
 
-        <!-- TAB: REMISIÓN / CARTA PORTE (UNIFICADAS) -->
+        <!-- TAB: REMISIÓN / CARTA PORTE -->
         <section id="sec-remision-cartaporte" class="content-sec hidden space-y-4">
             <form onsubmit="agregarRemisionCartaPorte(event)" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
                 <h2 class="text-lg font-semibold text-sky-400 mb-1">Nueva Remisión / Carta Porte</h2>
                 
                 <input type="text" id="rc-folio" placeholder="Folio / Documento" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-sky-500">
                 
-                <!-- Selección de Camión -->
                 <div>
                     <label class="block text-xs font-medium text-slate-400 mb-1">Seleccionar Camión</label>
                     <select id="rc-camion" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-sky-500 text-slate-200">
-                        <option value="">-- Cargar Camión --</option>
+                        <option value="">-- Seleccionar Camión --</option>
                     </select>
                 </div>
 
-                <!-- Selección de Chofer -->
                 <div>
                     <label class="block text-xs font-medium text-slate-400 mb-1">Seleccionar Chofer</label>
                     <select id="rc-chofer" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-sky-500 text-slate-200">
-                        <option value="">-- Cargar Chofer --</option>
+                        <option value="">-- Seleccionar Chofer --</option>
                     </select>
                 </div>
 
@@ -129,19 +148,94 @@
             </div>
         </section>
 
+        <!-- TAB: MANTENIMIENTO (NUEVO) -->
+        <section id="sec-mantenimiento" class="content-sec hidden space-y-4">
+            <form onsubmit="agregarMantenimiento(event)" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                <h2 class="text-lg font-semibold text-sky-400 mb-1">Registrar Mantenimiento</h2>
+                
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Seleccionar Camión</label>
+                    <select id="mant-camion" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-sky-500 text-slate-200">
+                        <option value="">-- Seleccionar Camión --</option>
+                    </select>
+                </div>
+
+                <input type="text" id="mant-servicio" placeholder="Servicio Realizado (ej. Cambio de aceite, Frenos)" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-sky-500">
+                <input type="text" id="mant-numparte" placeholder="Número de Parte / Refacción" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-sky-500">
+                
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Adjuntar Imagen / Evidencia</label>
+                    <input type="file" id="mant-imagen" accept="image/*" capture="environment" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-sky-600 file:text-white hover:file:bg-sky-500">
+                </div>
+
+                <textarea id="mant-notas" placeholder="Notas o detalles adicionales..." rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-sky-500"></textarea>
+
+                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 font-medium py-2.5 rounded-lg text-sm text-white transition-colors">Guardar Mantenimiento</button>
+            </form>
+
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <h3 class="text-sm font-semibold text-slate-300 mb-2">Historial de Mantenimientos</h3>
+                <div id="lista-mantenimientos" class="space-y-3"></div>
+            </div>
+        </section>
+
         <!-- TAB: PENDIENTES -->
         <section id="sec-pendientes" class="content-sec hidden space-y-4">
+            <form onsubmit="agregarPendiente(event)" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                <h2 class="text-lg font-semibold text-amber-400 mb-1">Registrar Tarea / Pendiente</h2>
+                <input type="text" id="pen-titulo" placeholder="Título (ej. Revisar presión de llantas)" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-amber-500">
+                
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Camión Asociado (Opcional)</label>
+                    <select id="pen-camion" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-amber-500 text-slate-200">
+                        <option value="General">General (Sin Camión Especifico)</option>
+                    </select>
+                </div>
+
+                <textarea id="pen-desc" placeholder="Detalles o notas adicionales..." rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-amber-500"></textarea>
+
+                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 font-medium py-2.5 rounded-lg text-sm text-white transition-colors">Guardar Pendiente</button>
+            </form>
+
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                <h2 class="text-lg font-semibold text-sky-400 mb-2">Tareas Pendientes</h2>
-                <p class="text-sm text-slate-400">Mantenimientos o tareas asignadas pendientes.</p>
+                <h3 class="text-sm font-semibold text-slate-300 mb-2">Lista de Pendientes</h3>
+                <div id="lista-pendientes" class="space-y-2"></div>
             </div>
         </section>
 
         <!-- TAB: COMPRAS -->
         <section id="sec-compras" class="content-sec hidden space-y-4">
+            <form onsubmit="agregarCompra(event)" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                <h2 class="text-lg font-semibold text-emerald-400 mb-1">Registrar Compra / Gasto</h2>
+                <input type="text" id="com-concepto" placeholder="Concepto (ej. Diesel, Llantas, Refacciones)" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-emerald-500">
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" step="0.01" id="com-monto" placeholder="Monto ($)" required class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-emerald-500">
+                    <select id="com-categoria" required class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-emerald-500 text-slate-200">
+                        <option value="Combustible">Combustible</option>
+                        <option value="Mantenimiento">Mantenimiento</option>
+                        <option value="Refacciones">Refacciones</option>
+                        <option value="Casetas / Peajes">Casetas / Peajes</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Camión Asociado (Opcional)</label>
+                    <select id="com-camion" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-emerald-500 text-slate-200">
+                        <option value="General">General (Gasto de Empresa)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 font-medium py-2.5 rounded-lg text-sm text-white transition-colors">Registrar Compra</button>
+            </form>
+
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                <h2 class="text-lg font-semibold text-sky-400 mb-2">Módulo de Compras</h2>
-                <p class="text-sm text-slate-400">Gastos, combustible y refacciones.</p>
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-sm font-semibold text-slate-300">Historial de Compras</h3>
+                    <span id="total-compras-badge" class="text-xs bg-emerald-900/60 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">$0.00</span>
+                </div>
+                <div id="lista-compras" class="space-y-2"></div>
             </div>
         </section>
 
@@ -152,7 +246,10 @@
         let db = {
             camiones: JSON.parse(localStorage.getItem('flota_camiones')) || [],
             choferes: JSON.parse(localStorage.getItem('flota_choferes')) || [],
-            remisiones: JSON.parse(localStorage.getItem('flota_remisiones')) || []
+            remisiones: JSON.parse(localStorage.getItem('flota_remisiones')) || [],
+            mantenimientos: JSON.parse(localStorage.getItem('flota_mantenimientos')) || [],
+            pendientes: JSON.parse(localStorage.getItem('flota_pendientes')) || [],
+            compras: JSON.parse(localStorage.getItem('flota_compras')) || []
         };
 
         function switchTab(tabId) {
@@ -173,56 +270,180 @@
         function renderSelects() {
             const camionSelect = document.getElementById('rc-camion');
             const choferSelect = document.getElementById('rc-chofer');
+            const mantCamionSelect = document.getElementById('mant-camion');
+            const penCamionSelect = document.getElementById('pen-camion');
+            const comCamionSelect = document.getElementById('com-camion');
 
             camionSelect.innerHTML = '<option value="">-- Seleccionar Camión --</option>';
+            mantCamionSelect.innerHTML = '<option value="">-- Seleccionar Camión --</option>';
+            penCamionSelect.innerHTML = '<option value="General">General (Sin Camión)</option>';
+            comCamionSelect.innerHTML = '<option value="General">General (Gasto Empresa)</option>';
+
             db.camiones.forEach(c => {
-                camionSelect.innerHTML += `<option value="Eco ${c.eco} (${c.placas})">Eco ${c.eco} - ${c.modelo} (${c.placas})</option>`;
+                const optText = `Eco ${c.eco} - ${c.modelo} (${c.placas})`;
+                camionSelect.innerHTML += `<option value="${optText}">${optText}</option>`;
+                mantCamionSelect.innerHTML += `<option value="Eco ${c.eco}">Eco ${c.eco} - ${c.modelo}</option>`;
+                penCamionSelect.innerHTML += `<option value="Eco ${c.eco}">Eco ${c.eco}</option>`;
+                comCamionSelect.innerHTML += `<option value="Eco ${c.eco}">Eco ${c.eco}</option>`;
             });
 
             choferSelect.innerHTML = '<option value="">-- Seleccionar Chofer --</option>';
             db.choferes.forEach(ch => {
-                choferSelect.innerHTML += `<option value="${ch.nombre}">Chofer: ${ch.nombre} (Lic: ${ch.licencia})</option>`;
+                choferSelect.innerHTML += `<option value="${ch.nombre}">${ch.nombre} (Lic: ${ch.licencia})</option>`;
             });
 
+            // Counters
             document.getElementById('count-camiones').innerText = db.camiones.length;
             document.getElementById('count-choferes').innerText = db.choferes.length;
+            document.getElementById('count-mantenimiento').innerText = db.mantenimientos.length;
+            document.getElementById('count-pendientes').innerText = db.pendientes.filter(p => !p.completado).length;
+            
+            const totalGasto = db.compras.reduce((sum, item) => sum + parseFloat(item.monto || 0), 0);
+            document.getElementById('total-compras-badge').innerText = `Total: $${totalGasto.toFixed(2)}`;
         }
 
-        function agregarCamion(e) {
+        /* --- CAMIONES --- */
+        function guardarCamion(e) {
             e.preventDefault();
             const eco = document.getElementById('camion-eco').value;
             const placas = document.getElementById('camion-placas').value;
             const modelo = document.getElementById('camion-modelo').value;
+            const index = parseInt(document.getElementById('camion-index').value);
 
-            db.camiones.push({ eco, placas, modelo });
+            if(index >= 0) {
+                db.camiones[index] = { eco, placas, modelo };
+            } else {
+                db.camiones.push({ eco, placas, modelo });
+            }
+
             localStorage.setItem('flota_camiones', JSON.stringify(db.camiones));
-            e.target.reset();
+            cancelarEdicionCamion();
             renderCamiones();
             renderSelects();
         }
 
-        function renderCamiones() {
-            const ul = document.getElementById('lista-camiones');
-            ul.innerHTML = db.camiones.map(c => `<li class="py-2"><strong>Eco ${c.eco}</strong> - ${c.modelo} (${c.placas})</li>`).join('');
+        function editarCamion(i) {
+            const c = db.camiones[i];
+            document.getElementById('camion-eco').value = c.eco;
+            document.getElementById('camion-placas').value = c.placas;
+            document.getElementById('camion-modelo').value = c.modelo;
+            document.getElementById('camion-index').value = i;
+
+            document.getElementById('form-camion-title').innerText = "Editar Camión";
+            document.getElementById('btn-camion-submit').innerText = "Actualizar Camión";
+            document.getElementById('btn-camion-cancel').classList.remove('hidden');
         }
 
-        function agregarChofer(e) {
+        function cancelarEdicionCamion() {
+            document.getElementById('camion-eco').value = '';
+            document.getElementById('camion-placas').value = '';
+            document.getElementById('camion-modelo').value = '';
+            document.getElementById('camion-index').value = -1;
+
+            document.getElementById('form-camion-title').innerText = "Registrar Camión";
+            document.getElementById('btn-camion-submit').innerText = "Guardar Camión";
+            document.getElementById('btn-camion-cancel').classList.add('hidden');
+        }
+
+        function eliminarCamion(i) {
+            if(confirm("¿Deseas eliminar este camión?")) {
+                db.camiones.splice(i, 1);
+                localStorage.setItem('flota_camiones', JSON.stringify(db.camiones));
+                renderCamiones();
+                renderSelects();
+            }
+        }
+
+        function renderCamiones() {
+            const div = document.getElementById('lista-camiones');
+            if(db.camiones.length === 0) {
+                div.innerHTML = '<p class="text-xs text-slate-500">No hay camiones registrados.</p>';
+                return;
+            }
+            div.innerHTML = db.camiones.map((c, i) => `
+                <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-sm">
+                    <div>
+                        <p class="font-bold text-sky-400">Eco ${c.eco}</p>
+                        <p class="text-xs text-slate-300">${c.modelo} - <span class="text-slate-400">${c.placas}</span></p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="editarCamion(${i})" class="text-sky-400 hover:text-sky-300 px-2 py-1 bg-slate-800 rounded"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="eliminarCamion(${i})" class="text-rose-400 hover:text-rose-300 px-2 py-1 bg-slate-800 rounded"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        /* --- CHOFERES --- */
+        function guardarChofer(e) {
             e.preventDefault();
             const nombre = document.getElementById('chofer-nombre').value;
             const licencia = document.getElementById('chofer-licencia').value;
+            const index = parseInt(document.getElementById('chofer-index').value);
 
-            db.choferes.push({ nombre, licencia });
+            if(index >= 0) {
+                db.choferes[index] = { nombre, licencia };
+            } else {
+                db.choferes.push({ nombre, licencia });
+            }
+
             localStorage.setItem('flota_choferes', JSON.stringify(db.choferes));
-            e.target.reset();
+            cancelarEdicionChofer();
             renderChoferes();
             renderSelects();
         }
 
-        function renderChoferes() {
-            const ul = document.getElementById('lista-choferes');
-            ul.innerHTML = db.choferes.map(ch => `<li class="py-2"><strong>${ch.nombre}</strong> - Lic: ${ch.licencia}</li>`).join('');
+        function editarChofer(i) {
+            const ch = db.choferes[i];
+            document.getElementById('chofer-nombre').value = ch.nombre;
+            document.getElementById('chofer-licencia').value = ch.licencia;
+            document.getElementById('chofer-index').value = i;
+
+            document.getElementById('form-chofer-title').innerText = "Editar Chofer";
+            document.getElementById('btn-chofer-submit').innerText = "Actualizar Chofer";
+            document.getElementById('btn-chofer-cancel').classList.remove('hidden');
         }
 
+        function cancelarEdicionChofer() {
+            document.getElementById('chofer-nombre').value = '';
+            document.getElementById('chofer-licencia').value = '';
+            document.getElementById('chofer-index').value = -1;
+
+            document.getElementById('form-chofer-title').innerText = "Registrar Chofer";
+            document.getElementById('btn-chofer-submit').innerText = "Guardar Chofer";
+            document.getElementById('btn-chofer-cancel').classList.add('hidden');
+        }
+
+        function eliminarChofer(i) {
+            if(confirm("¿Deseas eliminar este chofer?")) {
+                db.choferes.splice(i, 1);
+                localStorage.setItem('flota_choferes', JSON.stringify(db.choferes));
+                renderChoferes();
+                renderSelects();
+            }
+        }
+
+        function renderChoferes() {
+            const div = document.getElementById('lista-choferes');
+            if(db.choferes.length === 0) {
+                div.innerHTML = '<p class="text-xs text-slate-500">No hay choferes registrados.</p>';
+                return;
+            }
+            div.innerHTML = db.choferes.map((ch, i) => `
+                <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-sm">
+                    <div>
+                        <p class="font-bold text-white">${ch.nombre}</p>
+                        <p class="text-xs text-slate-400">Licencia: ${ch.licencia}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="editarChofer(${i})" class="text-sky-400 hover:text-sky-300 px-2 py-1 bg-slate-800 rounded"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="eliminarChofer(${i})" class="text-rose-400 hover:text-rose-300 px-2 py-1 bg-slate-800 rounded"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        /* --- REMISIÓN / CARTA PORTE --- */
         function agregarRemisionCartaPorte(e) {
             e.preventDefault();
             const folio = document.getElementById('rc-folio').value;
@@ -232,7 +453,7 @@
             const destino = document.getElementById('rc-destino').value;
             const carga = document.getElementById('rc-carga').value;
 
-            db.remisiones.push({ folio, camion, chofer, origen, destino, carga, fecha: new Date().toLocaleDateString() });
+            db.remisiones.unshift({ folio, camion, chofer, origen, destino, carga, fecha: new Date().toLocaleDateString() });
             localStorage.setItem('flota_remisiones', JSON.stringify(db.remisiones));
             e.target.reset();
             renderRemisiones();
@@ -240,6 +461,10 @@
 
         function renderRemisiones() {
             const container = document.getElementById('lista-rc');
+            if(db.remisiones.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-500">No hay documentos generados.</p>';
+                return;
+            }
             container.innerHTML = db.remisiones.map(r => `
                 <div class="bg-slate-900 p-3 rounded-lg border border-slate-700">
                     <div class="flex justify-between text-xs text-sky-400 font-bold mb-1">
@@ -249,6 +474,167 @@
                     <p class="text-slate-200"><strong>Camión:</strong> ${r.camion}</p>
                     <p class="text-slate-200"><strong>Chofer:</strong> ${r.chofer}</p>
                     <p class="text-slate-400 text-xs mt-1">Ruta: ${r.origen} ➔ ${r.destino}</p>
+                    ${r.carga ? `<p class="text-xs text-slate-500 mt-0.5">Carga: ${r.carga}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        /* --- MANTENIMIENTO --- */
+        function agregarMantenimiento(e) {
+            e.preventDefault();
+            const camion = document.getElementById('mant-camion').value;
+            const servicio = document.getElementById('mant-servicio').value;
+            const numParte = document.getElementById('mant-numparte').value;
+            const notas = document.getElementById('mant-notas').value;
+            const fileInput = document.getElementById('mant-imagen');
+
+            const guardarRegistro = (imgBase64) => {
+                db.mantenimientos.unshift({
+                    camion, servicio, numParte, notas, imagen: imgBase64, fecha: new Date().toLocaleDateString()
+                });
+                localStorage.setItem('flota_mantenimientos', JSON.stringify(db.mantenimientos));
+                e.target.reset();
+                renderMantenimientos();
+                renderSelects();
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    guardarRegistro(evt.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                guardarRegistro(null);
+            }
+        }
+
+        function eliminarMantenimiento(i) {
+            if(confirm("¿Deseas eliminar este registro de mantenimiento?")) {
+                db.mantenimientos.splice(i, 1);
+                localStorage.setItem('flota_mantenimientos', JSON.stringify(db.mantenimientos));
+                renderMantenimientos();
+                renderSelects();
+            }
+        }
+
+        function renderMantenimientos() {
+            const container = document.getElementById('lista-mantenimientos');
+            if(db.mantenimientos.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-500">No hay mantenimientos registrados.</p>';
+                return;
+            }
+            container.innerHTML = db.mantenimientos.map((m, i) => `
+                <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 text-sm space-y-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="font-bold text-sky-400">${m.camion}</span>
+                            <p class="font-medium text-slate-200 mt-0.5">${m.servicio}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-slate-400">${m.fecha}</span>
+                            <button onclick="eliminarMantenimiento(${i})" class="text-rose-400 hover:text-rose-300 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    ${m.numParte ? `<p class="text-xs text-amber-400/90 font-mono"><strong>N° Parte:</strong> ${m.numParte}</p>` : ''}
+                    ${m.notas ? `<p class="text-xs text-slate-400">${m.notas}</p>` : ''}
+                    ${m.imagen ? `<img src="${m.imagen}" class="w-full max-h-48 object-cover rounded-lg border border-slate-800 mt-2">` : ''}
+                </div>
+            `).join('');
+        }
+
+        /* --- PENDIENTES --- */
+        function agregarPendiente(e) {
+            e.preventDefault();
+            const titulo = document.getElementById('pen-titulo').value;
+            const camion = document.getElementById('pen-camion').value;
+            const desc = document.getElementById('pen-desc').value;
+
+            db.pendientes.unshift({ titulo, camion, desc, completado: false, fecha: new Date().toLocaleDateString() });
+            localStorage.setItem('flota_pendientes', JSON.stringify(db.pendientes));
+            e.target.reset();
+            renderPendientes();
+            renderSelects();
+        }
+
+        function togglePendiente(i) {
+            db.pendientes[i].completado = !db.pendientes[i].completado;
+            localStorage.setItem('flota_pendientes', JSON.stringify(db.pendientes));
+            renderPendientes();
+            renderSelects();
+        }
+
+        function eliminarPendiente(i) {
+            db.pendientes.splice(i, 1);
+            localStorage.setItem('flota_pendientes', JSON.stringify(db.pendientes));
+            renderPendientes();
+            renderSelects();
+        }
+
+        function renderPendientes() {
+            const container = document.getElementById('lista-pendientes');
+            if(db.pendientes.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-500">No hay pendientes registrados.</p>';
+                return;
+            }
+            container.innerHTML = db.pendientes.map((p, i) => `
+                <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-start text-sm ${p.completado ? 'opacity-50 line-through' : ''}">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" ${p.completado ? 'checked' : ''} onchange="togglePendiente(${i})" class="rounded text-amber-500 focus:ring-0">
+                            <span class="font-semibold text-slate-100">${p.titulo}</span>
+                            <span class="text-xs bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">${p.camion}</span>
+                        </div>
+                        ${p.desc ? `<p class="text-xs text-slate-400 mt-1 pl-6">${p.desc}</p>` : ''}
+                    </div>
+                    <button onclick="eliminarPendiente(${i})" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        /* --- COMPRAS --- */
+        function agregarCompra(e) {
+            e.preventDefault();
+            const concepto = document.getElementById('com-concepto').value;
+            const monto = parseFloat(document.getElementById('com-monto').value);
+            const categoria = document.getElementById('com-categoria').value;
+            const camion = document.getElementById('com-camion').value;
+
+            db.compras.unshift({ concepto, monto, categoria, camion, fecha: new Date().toLocaleDateString() });
+            localStorage.setItem('flota_compras', JSON.stringify(db.compras));
+            e.target.reset();
+            renderCompras();
+            renderSelects();
+        }
+
+        function eliminarCompra(i) {
+            if(confirm("¿Deseas eliminar este registro de compra?")) {
+                db.compras.splice(i, 1);
+                localStorage.setItem('flota_compras', JSON.stringify(db.compras));
+                renderCompras();
+                renderSelects();
+            }
+        }
+
+        function renderCompras() {
+            const container = document.getElementById('lista-compras');
+            if(db.compras.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-500">No hay compras registradas.</p>';
+                return;
+            }
+            container.innerHTML = db.compras.map((c, i) => `
+                <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-sm">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-white">${c.concepto}</span>
+                            <span class="text-xs bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800/50">${c.categoria}</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-0.5">${c.camion} • ${c.fecha}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold text-emerald-400">$${parseFloat(c.monto).toFixed(2)}</span>
+                        <button onclick="eliminarCompra(${i})" class="text-rose-400 hover:text-rose-300 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -257,6 +643,9 @@
         renderCamiones();
         renderChoferes();
         renderRemisiones();
+        renderMantenimientos();
+        renderPendientes();
+        renderCompras();
         renderSelects();
     </script>
 </body>
