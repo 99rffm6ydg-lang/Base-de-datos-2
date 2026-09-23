@@ -2,29 +2,38 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APP Gestión de Flota</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Flota APP","short_name":"FlotaApp","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#1e293b"}'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gestión de Flota</title>
+    
+    <!-- PWA Settings -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FlotaApp">
+    
+    <!-- CSS & Fonts Local Caching Ready -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-24 font-sans">
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-24 font-sans select-none">
 
     <!-- Header -->
     <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 px-4 py-3 flex justify-between items-center shadow-lg">
         <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-truck-front text-blue-500 text-2xl"></i>
-            <h1 class="font-bold text-lg tracking-wide text-white">Gestión de Flota</h1>
+            <i class="fa-solid fa-truck-front text-blue-500 text-xl"></i>
+            <h1 class="font-bold text-base tracking-wide text-white">Gestión de Flota</h1>
         </div>
-        <span class="text-xs px-2.5 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full flex items-center gap-1.5 font-medium">
-            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> Local Active
+        <span id="status-badge" class="text-xs px-2.5 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full flex items-center gap-1.5 font-medium">
+            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> Offline Ready
         </span>
     </header>
 
-    <!-- Menú Superior de Navegación por Categorías (Scroll Horizontal) -->
-    <nav class="bg-slate-800/80 backdrop-blur-md border-b border-slate-700/80 sticky top-[53px] z-40 overflow-x-auto no-scrollbar py-2 px-2 flex space-x-2 text-xs font-semibold">
+    <!-- Menú Superior de 9 Pestañas -->
+    <nav class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700 sticky top-[53px] z-40 overflow-x-auto no-scrollbar py-2 px-2 flex space-x-2 text-xs font-semibold">
         <button onclick="switchTab('inicio')" id="btn-tab-inicio" class="tab-btn px-3 py-1.5 rounded-lg bg-blue-600 text-white whitespace-nowrap">Inicio</button>
         <button onclick="switchTab('remision')" id="btn-tab-remision" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 whitespace-nowrap">Remisión</button>
         <button onclick="switchTab('cartaporte')" id="btn-tab-cartaporte" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 whitespace-nowrap">Carta Porte</button>
@@ -39,14 +48,14 @@
     <!-- Main Container -->
     <main class="max-w-4xl mx-auto p-4">
 
-        <!-- 1. INICIO / DASHBOARD -->
+        <!-- 1. INICIO -->
         <section id="tab-inicio" class="tab-content space-y-4">
-            <h2 class="text-xl font-bold text-blue-400 flex items-center gap-2">
+            <h2 class="text-lg font-bold text-blue-400 flex items-center gap-2">
                 <i class="fa-solid fa-chart-pie"></i> Resumen General
             </h2>
             <div class="grid grid-cols-2 gap-3">
                 <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                    <span class="text-xs text-slate-400">Total Camiones</span>
+                    <span class="text-xs text-slate-400">Camiones</span>
                     <p id="dash-camiones" class="text-2xl font-bold text-white mt-1">0</p>
                 </div>
                 <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
@@ -66,13 +75,13 @@
 
         <!-- 2. REMISIÓN -->
         <section id="tab-remision" class="tab-content hidden space-y-4">
-            <h2 class="text-xl font-bold text-blue-400 flex items-center gap-2">
+            <h2 class="text-lg font-bold text-blue-400 flex items-center gap-2">
                 <i class="fa-solid fa-file-invoice"></i> Remisiones
             </h2>
             <form id="form-remision" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <input type="text" id="rem-folio" required placeholder="Folio de Remisión" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-                <input type="text" id="rem-cliente" required placeholder="Cliente / Destinatario" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-                <textarea id="rem-concepto" required rows="2" placeholder="Concepto / Material enviado" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm"></textarea>
+                <input type="text" id="rem-folio" required placeholder="Folio" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                <input type="text" id="rem-cliente" required placeholder="Cliente" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                <textarea id="rem-concepto" required rows="2" placeholder="Concepto / Material" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white"></textarea>
                 <button type="submit" class="w-full bg-blue-600 font-semibold py-3 rounded-lg text-white">Guardar Remisión</button>
             </form>
             <div id="lista-remision" class="space-y-2"></div>
@@ -80,13 +89,13 @@
 
         <!-- 3. CARTA PORTE -->
         <section id="tab-cartaporte" class="tab-content hidden space-y-4">
-            <h2 class="text-xl font-bold text-purple-400 flex items-center gap-2">
+            <h2 class="text-lg font-bold text-purple-400 flex items-center gap-2">
                 <i class="fa-solid fa-route"></i> Carta Porte
             </h2>
             <form id="form-cartaporte" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <input type="text" id="cp-origen" required placeholder="Origen de Carga" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-                <input type="text" id="cp-destino" required placeholder="Destino Final" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-                <input type="text" id="cp-mercancia" required placeholder="Tipo de Mercancía / Peso" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="text" id="cp-origen" required placeholder="Origen" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                <input type="text" id="cp-destino" required placeholder="Destino" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                <input type="text" id="cp-mercancia" required placeholder="Mercancía / Peso" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
                 <button type="submit" class="w-full bg-purple-600 font-semibold py-3 rounded-lg text-white">Registrar Carta Porte</button>
             </form>
             <div id="lista-cartaporte" class="space-y-2"></div>
@@ -94,12 +103,12 @@
 
         <!-- 4. PENDIENTES -->
         <section id="tab-pendientes" class="tab-content hidden space-y-4">
-            <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-list-check"></i> Pendientes por Hacer
+            <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2">
+                <i class="fa-solid fa-list-check"></i> Pendientes
             </h2>
             <form id="form-pendientes" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <input type="text" id="pen-tarea" required placeholder="Descripción de la tarea o pendiente" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-                <select id="pen-prioridad" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="text" id="pen-tarea" required placeholder="Descripción del pendiente" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                <select id="pen-prioridad" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
                     <option value="Alta">Prioridad Alta</option>
                     <option value="Media">Prioridad Media</option>
                     <option value="Baja">Prioridad Baja</option>
@@ -111,12 +120,12 @@
 
         <!-- 5. COMPRAS -->
         <section id="tab-compras" class="tab-content hidden space-y-4">
-            <h2 class="text-xl font-bold text-emerald-400 flex items-center gap-2">
-                <i class="fa-solid fa-cart-shopping"></i> Compras / Insumos
+            <h2 class="text-lg font-bold text-emerald-400 flex items-center gap-2">
+                <i class="fa-solid fa-cart-shopping"></i> Compras
             </h2>
             <form id="form-compras" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <input type="text" id="com-item" required placeholder="Artículo o refacción a comprar" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-                <input type="number" id="com-monto" required placeholder="Monto Est. ($)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="text" id="com-item" required placeholder="Artículo a comprar" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                <input type="number" id="com-monto" required placeholder="Monto Est. ($)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
                 <button type="submit" class="w-full bg-emerald-600 font-semibold py-3 rounded-lg text-white">Registrar Compra</button>
             </form>
             <div id="lista-compras" class="space-y-2"></div>
@@ -124,40 +133,40 @@
 
         <!-- 6. IMÁGENES / PLÁSTICOS -->
         <section id="tab-imagenes" class="tab-content hidden space-y-4">
-            <h2 class="text-xl font-bold text-pink-400 flex items-center gap-2">
-                <i class="fa-solid fa-image"></i> Imágenes / Plásticos
+            <h2 class="text-lg font-bold text-pink-400 flex items-center gap-2">
+                <i class="fa-solid fa-image"></i> Imágenes Plásticos
             </h2>
             <form id="form-imagenes" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <input type="text" id="img-titulo" required placeholder="Descripción / Código de Plástico" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="text" id="img-titulo" required placeholder="Descripción / Código" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
                 <input type="file" id="img-archivo" accept="image/*" capture="environment" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-pink-600 file:text-white">
                 <button type="submit" class="w-full bg-pink-600 font-semibold py-3 rounded-lg text-white">Guardar Foto</button>
             </form>
             <div id="lista-imagenes" class="grid grid-cols-2 gap-2"></div>
         </section>
 
-        <!-- 7. LISTA DE CAMIONES -->
+        <!-- 7. CAMIONES -->
         <section id="tab-camiones" class="tab-content hidden space-y-4">
-            <h2 class="text-xl font-bold text-cyan-400 flex items-center gap-2">
+            <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2">
                 <i class="fa-solid fa-truck"></i> Lista de Camiones
             </h2>
             <form id="form-camiones" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <input type="text" id="cam-num" required placeholder="Número Económico / Eco" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-                <input type="text" id="cam-placas" required placeholder="Placas" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-                <input type="text" id="cam-modelo" required placeholder="Modelo / Marca" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="text" id="cam-num" required placeholder="Número Eco" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                <input type="text" id="cam-placas" required placeholder="Placas" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                <input type="text" id="cam-modelo" required placeholder="Modelo / Marca" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
                 <button type="submit" class="w-full bg-cyan-600 font-semibold py-3 rounded-lg text-white">Registrar Camión</button>
             </form>
             <div id="lista-camiones" class="space-y-2"></div>
         </section>
 
-        <!-- 8. LISTA DE CHÓFERES -->
+        <!-- 8. CHÓFERES -->
         <section id="tab-choferes" class="tab-content hidden space-y-4">
-            <h2 class="text-xl font-bold text-indigo-400 flex items-center gap-2">
+            <h2 class="text-lg font-bold text-indigo-400 flex items-center gap-2">
                 <i class="fa-solid fa-user-gear"></i> Lista de Chóferes
             </h2>
             <form id="form-choferes" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <input type="text" id="chof-nombre" required placeholder="Nombre completo" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-                <input type="text" id="chof-licencia" required placeholder="Número de Licencia" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-                <input type="tel" id="chof-tel" required placeholder="Teléfono de Contacto" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="text" id="chof-nombre" required placeholder="Nombre Completo" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                <input type="text" id="chof-licencia" required placeholder="Número Licencia" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                <input type="tel" id="chof-tel" required placeholder="Teléfono" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
                 <button type="submit" class="w-full bg-indigo-600 font-semibold py-3 rounded-lg text-white">Registrar Chófer</button>
             </form>
             <div id="lista-choferes" class="space-y-2"></div>
@@ -165,12 +174,12 @@
 
         <!-- 9. MANTENIMIENTO -->
         <section id="tab-mantenimiento" class="tab-content hidden space-y-4">
-            <h2 class="text-xl font-bold text-red-400 flex items-center gap-2">
+            <h2 class="text-lg font-bold text-red-400 flex items-center gap-2">
                 <i class="fa-solid fa-wrench"></i> Mantenimiento
             </h2>
             <form id="form-mantenimiento" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <input type="text" id="mant-camion" required placeholder="Camión / Unidad" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-                <textarea id="mant-falla" required rows="2" placeholder="Descripción de la Falla o Servicio" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm"></textarea>
+                <input type="text" id="mant-camion" required placeholder="Camión / Unidad" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white">
+                <textarea id="mant-falla" required rows="2" placeholder="Falla / Servicio" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white"></textarea>
                 <button type="submit" class="w-full bg-red-600 font-semibold py-3 rounded-lg text-white">Registrar Servicio</button>
             </form>
             <div id="lista-mantenimiento" class="space-y-2"></div>
@@ -178,20 +187,8 @@
 
     </main>
 
-    <!-- App Engine & Service Worker -->
     <script>
-        // Service Worker Offline
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                const CACHE = 'flota-v2';
-                self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./']))));
-                self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
-        }
-
-        // Pestañas
+        // Tab Engine
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(e => {
@@ -206,11 +203,10 @@
             }
         }
 
-        // Storage Helpers
+        // Local Storage System
         const getDB = (key) => JSON.parse(localStorage.getItem(key) || '[]');
         const setDB = (key, data) => localStorage.setItem(key, JSON.stringify(data));
 
-        // Compresión de fotos en iPhone
         function compressPhoto(file) {
             return new Promise((resolve) => {
                 if (!file) return resolve(null);
@@ -221,25 +217,24 @@
                     img.src = e.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const scale = 500 / img.width;
-                        canvas.width = 500;
+                        const scale = 400 / img.width;
+                        canvas.width = 400;
                         canvas.height = img.height * scale;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.5));
+                        resolve(canvas.toDataURL('image/jpeg', 0.4));
                     };
                 };
             });
         }
 
-        // Form Submit Event Listeners
+        // Event Forms
         document.getElementById('form-remision').addEventListener('submit', (e) => {
             e.preventDefault();
             const data = getDB('db_remisiones');
             data.unshift({ folio: document.getElementById('rem-folio').value, cliente: document.getElementById('rem-cliente').value, concepto: document.getElementById('rem-concepto').value });
             setDB('db_remisiones', data);
-            e.target.reset();
-            renderAll();
+            e.target.reset(); renderAll();
         });
 
         document.getElementById('form-cartaporte').addEventListener('submit', (e) => {
@@ -247,8 +242,7 @@
             const data = getDB('db_cartaporte');
             data.unshift({ origen: document.getElementById('cp-origen').value, destino: document.getElementById('cp-destino').value, mercancia: document.getElementById('cp-mercancia').value });
             setDB('db_cartaporte', data);
-            e.target.reset();
-            renderAll();
+            e.target.reset(); renderAll();
         });
 
         document.getElementById('form-pendientes').addEventListener('submit', (e) => {
@@ -256,8 +250,7 @@
             const data = getDB('db_pendientes');
             data.unshift({ tarea: document.getElementById('pen-tarea').value, prioridad: document.getElementById('pen-prioridad').value });
             setDB('db_pendientes', data);
-            e.target.reset();
-            renderAll();
+            e.target.reset(); renderAll();
         });
 
         document.getElementById('form-compras').addEventListener('submit', (e) => {
@@ -265,8 +258,7 @@
             const data = getDB('db_compras');
             data.unshift({ item: document.getElementById('com-item').value, monto: document.getElementById('com-monto').value });
             setDB('db_compras', data);
-            e.target.reset();
-            renderAll();
+            e.target.reset(); renderAll();
         });
 
         document.getElementById('form-imagenes').addEventListener('submit', async (e) => {
@@ -275,8 +267,7 @@
             const data = getDB('db_imagenes');
             data.unshift({ titulo: document.getElementById('img-titulo').value, img: photo });
             setDB('db_imagenes', data);
-            e.target.reset();
-            renderAll();
+            e.target.reset(); renderAll();
         });
 
         document.getElementById('form-camiones').addEventListener('submit', (e) => {
@@ -284,8 +275,7 @@
             const data = getDB('db_camiones');
             data.unshift({ num: document.getElementById('cam-num').value, placas: document.getElementById('cam-placas').value, modelo: document.getElementById('cam-modelo').value });
             setDB('db_camiones', data);
-            e.target.reset();
-            renderAll();
+            e.target.reset(); renderAll();
         });
 
         document.getElementById('form-choferes').addEventListener('submit', (e) => {
@@ -293,8 +283,7 @@
             const data = getDB('db_choferes');
             data.unshift({ nombre: document.getElementById('chof-nombre').value, licencia: document.getElementById('chof-licencia').value, tel: document.getElementById('chof-tel').value });
             setDB('db_choferes', data);
-            e.target.reset();
-            renderAll();
+            e.target.reset(); renderAll();
         });
 
         document.getElementById('form-mantenimiento').addEventListener('submit', (e) => {
@@ -302,19 +291,15 @@
             const data = getDB('db_mantenimiento');
             data.unshift({ camion: document.getElementById('mant-camion').value, falla: document.getElementById('mant-falla').value });
             setDB('db_mantenimiento', data);
-            e.target.reset();
-            renderAll();
+            e.target.reset(); renderAll();
         });
 
-        // Render Functions
         function renderAll() {
-            // Dashboard Counts
             document.getElementById('dash-camiones').innerText = getDB('db_camiones').length;
             document.getElementById('dash-choferes').innerText = getDB('db_choferes').length;
             document.getElementById('dash-pendientes').innerText = getDB('db_pendientes').length;
             document.getElementById('dash-remisiones').innerText = getDB('db_remisiones').length;
 
-            // Lists
             document.getElementById('lista-remision').innerHTML = getDB('db_remisiones').map(i => `<div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs"><p class="font-bold text-blue-400">Folio: ${i.folio}</p><p>Cliente: ${i.cliente}</p><p class="text-slate-400">${i.concepto}</p></div>`).join('');
             document.getElementById('lista-cartaporte').innerHTML = getDB('db_cartaporte').map(i => `<div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs"><p class="font-bold text-purple-400">${i.origen} ➔ ${i.destino}</p><p class="text-slate-400">Mercancía: ${i.mercancia}</p></div>`).join('');
             document.getElementById('lista-pendientes').innerHTML = getDB('db_pendientes').map(i => `<div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs flex justify-between"><span>${i.tarea}</span><span class="text-amber-400 font-bold">${i.prioridad}</span></div>`).join('');
