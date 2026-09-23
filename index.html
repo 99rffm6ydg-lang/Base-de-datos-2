@@ -3,203 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Flota PWA</title>
-    <!-- Tailwind CSS CDN -->
+    <title>APP Gestión de Flota</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- PWA Manifest Inline Data -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Gestión Flota","short_name":"FlotaPWA","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#1e293b","icons":[{"src":"https://via.placeholder.com/192","sizes":"192x192","type":"image/png"}]}'>
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Flota APP","short_name":"FlotaApp","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#1e293b"}'>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-20 font-sans">
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-24 font-sans">
 
-    <!-- Header / Navbar -->
+    <!-- Header -->
     <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 px-4 py-3 flex justify-between items-center shadow-lg">
         <div class="flex items-center space-x-2">
             <i class="fa-solid fa-truck-front text-blue-500 text-2xl"></i>
             <h1 class="font-bold text-lg tracking-wide text-white">Gestión de Flota</h1>
         </div>
-        <span id="status-tag" class="text-xs px-2 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full flex items-center gap-1">
+        <span class="text-xs px-2.5 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full flex items-center gap-1.5 font-medium">
             <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> Local Active
         </span>
     </header>
 
-    <!-- Main Container -->
-    <main class="max-w-4xl mx-auto p-4 space-y-6">
+    <!-- Menú Superior de Navegación por Categorías (Scroll Horizontal) -->
+    <nav class="bg-slate-800/80 backdrop-blur-md border-b border-slate-700/80 sticky top-[53px] z-40 overflow-x-auto no-scrollbar py-2 px-2 flex space-x-2 text-xs font-semibold">
+        <button onclick="switchTab('inicio')" id="btn-tab-inicio" class="tab-btn px-3 py-1.5 rounded-lg bg-blue-600 text-white whitespace-nowrap">Inicio</button>
+        <button onclick="switchTab('remision')" id="btn-tab-remision" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 whitespace-nowrap">Remisión</button>
+        <button onclick="switchTab('cartaporte')" id="btn-tab-cartaporte" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 whitespace-nowrap">Carta Porte</button>
+        <button onclick="switchTab('pendientes')" id="btn-tab-pendientes" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 whitespace-nowrap">Pendientes</button>
+        <button onclick="switchTab('compras')" id="btn-tab-compras" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 whitespace-nowrap">Compras</button>
+        <button onclick="switchTab('imagenes')" id="btn-tab-imagenes" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 whitespace-nowrap">Imágenes Plásticos</button>
+        <button onclick="switchTab('camiones')" id="btn-tab-camiones" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 whitespace-nowrap">Camiones</button>
+        <button onclick="switchTab('choferes')" id="btn-tab-choferes" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 whitespace-nowrap">Chóferes</button>
+        <button onclick="switchTab('mantenimiento')" id="btn-tab-mantenimiento" class="tab-btn px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300 whitespace-nowrap">Mantenimiento</button>
+    </nav>
 
-        <!-- Tab: Remisiones / Salidas -->
-        <section id="tab-remisiones" class="tab-content space-y-4">
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto p-4">
+
+        <!-- 1. INICIO / DASHBOARD -->
+        <section id="tab-inicio" class="tab-content space-y-4">
             <h2 class="text-xl font-bold text-blue-400 flex items-center gap-2">
-                <i class="fa-solid fa-file-contract"></i> Registrar Remisión / Salida
+                <i class="fa-solid fa-chart-pie"></i> Resumen General
+            </h2>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                    <span class="text-xs text-slate-400">Total Camiones</span>
+                    <p id="dash-camiones" class="text-2xl font-bold text-white mt-1">0</p>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                    <span class="text-xs text-slate-400">Chóferes</span>
+                    <p id="dash-choferes" class="text-2xl font-bold text-white mt-1">0</p>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                    <span class="text-xs text-slate-400">Pendientes</span>
+                    <p id="dash-pendientes" class="text-2xl font-bold text-amber-400 mt-1">0</p>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                    <span class="text-xs text-slate-400">Remisiones</span>
+                    <p id="dash-remisiones" class="text-2xl font-bold text-blue-400 mt-1">0</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. REMISIÓN -->
+        <section id="tab-remision" class="tab-content hidden space-y-4">
+            <h2 class="text-xl font-bold text-blue-400 flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice"></i> Remisiones
             </h2>
             <form id="form-remision" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Vehículo / Unidad</label>
-                    <input type="text" id="rem-unidad" required placeholder="Ej. Camión 01 - ABC-123" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Conductor</label>
-                    <input type="text" id="rem-conductor" required placeholder="Nombre del chofer" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Detalle de Carga / Destino</label>
-                    <textarea id="rem-detalle" required rows="2" placeholder="Notas sobre el envío o destino..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Evidencia Fotográfica</label>
-                    <input type="file" id="rem-foto" accept="image/*" capture="environment" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
-                </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-lg shadow-md transition-all active:scale-98">
-                    Guardar Remisión
-                </button>
+                <input type="text" id="rem-folio" required placeholder="Folio de Remisión" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="text" id="rem-cliente" required placeholder="Cliente / Destinatario" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <textarea id="rem-concepto" required rows="2" placeholder="Concepto / Material enviado" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm"></textarea>
+                <button type="submit" class="w-full bg-blue-600 font-semibold py-3 rounded-lg text-white">Guardar Remisión</button>
             </form>
-
-            <div class="space-y-3">
-                <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Historial Reciente</h3>
-                <div id="lista-remisiones" class="space-y-2"></div>
-            </div>
+            <div id="lista-remision" class="space-y-2"></div>
         </section>
 
-        <!-- Tab: Mantenimiento -->
-        <section id="tab-mantenimiento" class="tab-content hidden space-y-4">
+        <!-- 3. CARTA PORTE -->
+        <section id="tab-cartaporte" class="tab-content hidden space-y-4">
+            <h2 class="text-xl font-bold text-purple-400 flex items-center gap-2">
+                <i class="fa-solid fa-route"></i> Carta Porte
+            </h2>
+            <form id="form-cartaporte" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                <input type="text" id="cp-origen" required placeholder="Origen de Carga" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="text" id="cp-destino" required placeholder="Destino Final" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="text" id="cp-mercancia" required placeholder="Tipo de Mercancía / Peso" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <button type="submit" class="w-full bg-purple-600 font-semibold py-3 rounded-lg text-white">Registrar Carta Porte</button>
+            </form>
+            <div id="lista-cartaporte" class="space-y-2"></div>
+        </section>
+
+        <!-- 4. PENDIENTES -->
+        <section id="tab-pendientes" class="tab-content hidden space-y-4">
             <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-wrench"></i> Registro de Mantenimiento
+                <i class="fa-solid fa-list-check"></i> Pendientes por Hacer
+            </h2>
+            <form id="form-pendientes" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                <input type="text" id="pen-tarea" required placeholder="Descripción de la tarea o pendiente" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <select id="pen-prioridad" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                    <option value="Alta">Prioridad Alta</option>
+                    <option value="Media">Prioridad Media</option>
+                    <option value="Baja">Prioridad Baja</option>
+                </select>
+                <button type="submit" class="w-full bg-amber-600 font-semibold py-3 rounded-lg text-white">Agregar Pendiente</button>
+            </form>
+            <div id="lista-pendientes" class="space-y-2"></div>
+        </section>
+
+        <!-- 5. COMPRAS -->
+        <section id="tab-compras" class="tab-content hidden space-y-4">
+            <h2 class="text-xl font-bold text-emerald-400 flex items-center gap-2">
+                <i class="fa-solid fa-cart-shopping"></i> Compras / Insumos
+            </h2>
+            <form id="form-compras" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                <input type="text" id="com-item" required placeholder="Artículo o refacción a comprar" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="number" id="com-monto" required placeholder="Monto Est. ($)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <button type="submit" class="w-full bg-emerald-600 font-semibold py-3 rounded-lg text-white">Registrar Compra</button>
+            </form>
+            <div id="lista-compras" class="space-y-2"></div>
+        </section>
+
+        <!-- 6. IMÁGENES / PLÁSTICOS -->
+        <section id="tab-imagenes" class="tab-content hidden space-y-4">
+            <h2 class="text-xl font-bold text-pink-400 flex items-center gap-2">
+                <i class="fa-solid fa-image"></i> Imágenes / Plásticos
+            </h2>
+            <form id="form-imagenes" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                <input type="text" id="img-titulo" required placeholder="Descripción / Código de Plástico" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="file" id="img-archivo" accept="image/*" capture="environment" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-pink-600 file:text-white">
+                <button type="submit" class="w-full bg-pink-600 font-semibold py-3 rounded-lg text-white">Guardar Foto</button>
+            </form>
+            <div id="lista-imagenes" class="grid grid-cols-2 gap-2"></div>
+        </section>
+
+        <!-- 7. LISTA DE CAMIONES -->
+        <section id="tab-camiones" class="tab-content hidden space-y-4">
+            <h2 class="text-xl font-bold text-cyan-400 flex items-center gap-2">
+                <i class="fa-solid fa-truck"></i> Lista de Camiones
+            </h2>
+            <form id="form-camiones" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                <input type="text" id="cam-num" required placeholder="Número Económico / Eco" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="text" id="cam-placas" required placeholder="Placas" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="text" id="cam-modelo" required placeholder="Modelo / Marca" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <button type="submit" class="w-full bg-cyan-600 font-semibold py-3 rounded-lg text-white">Registrar Camión</button>
+            </form>
+            <div id="lista-camiones" class="space-y-2"></div>
+        </section>
+
+        <!-- 8. LISTA DE CHÓFERES -->
+        <section id="tab-choferes" class="tab-content hidden space-y-4">
+            <h2 class="text-xl font-bold text-indigo-400 flex items-center gap-2">
+                <i class="fa-solid fa-user-gear"></i> Lista de Chóferes
+            </h2>
+            <form id="form-choferes" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                <input type="text" id="chof-nombre" required placeholder="Nombre completo" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="text" id="chof-licencia" required placeholder="Número de Licencia" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <input type="tel" id="chof-tel" required placeholder="Teléfono de Contacto" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <button type="submit" class="w-full bg-indigo-600 font-semibold py-3 rounded-lg text-white">Registrar Chófer</button>
+            </form>
+            <div id="lista-choferes" class="space-y-2"></div>
+        </section>
+
+        <!-- 9. MANTENIMIENTO -->
+        <section id="tab-mantenimiento" class="tab-content hidden space-y-4">
+            <h2 class="text-xl font-bold text-red-400 flex items-center gap-2">
+                <i class="fa-solid fa-wrench"></i> Mantenimiento
             </h2>
             <form id="form-mantenimiento" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Vehículo / Unidad</label>
-                    <input type="text" id="mant-unidad" required placeholder="Ej. Camión 02" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-amber-500">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Tipo Servicio</label>
-                        <select id="mant-tipo" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-amber-500">
-                            <option value="Preventivo">Preventivo</option>
-                            <option value="Correctivo">Correctivo</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Costo Est. ($)</label>
-                        <input type="number" id="mant-costo" placeholder="0.00" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-amber-500">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Descripción del Trabajo</label>
-                    <textarea id="mant-desc" required rows="2" placeholder="Cambio de aceite, frenos, etc..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-amber-500"></textarea>
-                </div>
-                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-3 rounded-lg shadow-md transition-all active:scale-98">
-                    Registrar Mantenimiento
-                </button>
+                <input type="text" id="mant-camion" required placeholder="Camión / Unidad" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+                <textarea id="mant-falla" required rows="2" placeholder="Descripción de la Falla o Servicio" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm"></textarea>
+                <button type="submit" class="w-full bg-red-600 font-semibold py-3 rounded-lg text-white">Registrar Servicio</button>
             </form>
-
-            <div class="space-y-3">
-                <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Mantenimientos Registrados</h3>
-                <div id="lista-mantenimientos" class="space-y-2"></div>
-            </div>
-        </section>
-
-        <!-- Tab: Inventario / Flota -->
-        <section id="tab-inventario" class="tab-content hidden space-y-4">
-            <h2 class="text-xl font-bold text-emerald-400 flex items-center gap-2">
-                <i class="fa-solid fa-boxes-stacked"></i> Estado de la Flota / Equipos
-            </h2>
-            <form id="form-inventario" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Nombre de Equipo / Pieza</label>
-                    <input type="text" id="inv-nombre" required placeholder="Ej. Llantas 295/80 R22.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-emerald-500">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Cantidad</label>
-                        <input type="number" id="inv-cant" required placeholder="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-emerald-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Estado</label>
-                        <select id="inv-estado" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-emerald-500">
-                            <option value="Nuevo">Nuevo / Excelente</option>
-                            <option value="Usado">Usado / Funcional</option>
-                            <option value="Dañado">Requiere Cambio</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-lg shadow-md transition-all active:scale-98">
-                    Agregar al Inventario
-                </button>
-            </form>
-
-            <div class="space-y-3">
-                <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Inventario Actual</h3>
-                <div id="lista-inventario" class="space-y-2"></div>
-            </div>
+            <div id="lista-mantenimiento" class="space-y-2"></div>
         </section>
 
     </main>
 
-    <!-- Navigation Bar (Bottom) -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 flex justify-around py-2 z-50">
-        <button onclick="switchTab('remisiones')" id="nav-remisiones" class="flex flex-col items-center text-blue-400 text-xs font-medium">
-            <i class="fa-solid fa-file-contract text-lg mb-0.5"></i>
-            <span>Remisiones</span>
-        </button>
-        <button onclick="switchTab('mantenimiento')" id="nav-mantenimiento" class="flex flex-col items-center text-slate-400 text-xs font-medium hover:text-slate-200">
-            <i class="fa-solid fa-wrench text-lg mb-0.5"></i>
-            <span>Taller</span>
-        </button>
-        <button onclick="switchTab('inventario')" id="nav-inventario" class="flex flex-col items-center text-slate-400 text-xs font-medium hover:text-slate-200">
-            <i class="fa-solid fa-boxes-stacked text-lg mb-0.5"></i>
-            <span>Inventario</span>
-        </button>
-    </nav>
-
-    <!-- Logic Script & Dynamic Service Worker -->
+    <!-- App Engine & Service Worker -->
     <script>
-        // Registrar Service Worker Inline para funcionalidad Offline
+        // Service Worker Offline
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'pwa-flota-v1';
-                self.addEventListener('install', e => {
-                    e.waitUntil(
-                        caches.open(CACHE_NAME).then(cache => {
-                            return cache.addAll(['./']);
-                        })
-                    );
-                });
-                self.addEventListener('fetch', e => {
-                    e.respondWith(
-                        caches.match(e.request).then(response => response || fetch(e.request))
-                    );
-                });
+                const CACHE = 'flota-v2';
+                self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./']))));
+                self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
             `;
             const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(() => {});
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
         }
 
-        // Keys
-        const STORAGE_REM = 'pwa_flota_remisiones';
-        const STORAGE_MANT = 'pwa_flota_mantenimiento';
-        const STORAGE_INV = 'pwa_flota_inventario';
-
-        // Tab Navigation
+        // Pestañas
         function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(el => {
-                el.classList.remove('text-blue-400', 'text-amber-400', 'text-emerald-400');
-                el.classList.add('text-slate-400');
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(e => {
+                e.classList.remove('bg-blue-600', 'text-white');
+                e.classList.add('bg-slate-700', 'text-slate-300');
             });
-
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            const activeNav = document.getElementById(`nav-${tab}`);
-            
-            if(tab === 'remisiones') activeNav.classList.add('text-blue-400');
-            if(tab === 'mantenimiento') activeNav.classList.add('text-amber-400');
-            if(tab === 'inventario') activeNav.classList.add('text-emerald-400');
+            const activeBtn = document.getElementById(`btn-tab-${tab}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-slate-700', 'text-slate-300');
+                activeBtn.classList.add('bg-blue-600', 'text-white');
+            }
         }
 
-        // Compresión de fotos para evitar saturar localStorage en iPhone
-        function compressAndGetBase64(file) {
+        // Storage Helpers
+        const getDB = (key) => JSON.parse(localStorage.getItem(key) || '[]');
+        const setDB = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+
+        // Compresión de fotos en iPhone
+        function compressPhoto(file) {
             return new Promise((resolve) => {
                 if (!file) return resolve(null);
                 const reader = new FileReader();
@@ -209,147 +221,111 @@
                     img.src = e.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 600;
-                        const scaleSize = MAX_WIDTH / img.width;
-                        canvas.width = MAX_WIDTH;
-                        canvas.height = img.height * scaleSize;
+                        const scale = 500 / img.width;
+                        canvas.width = 500;
+                        canvas.height = img.height * scale;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.6));
+                        resolve(canvas.toDataURL('image/jpeg', 0.5));
                     };
                 };
             });
         }
 
-        // Remisiones Submit
-        document.getElementById('form-remision').addEventListener('submit', async (e) => {
+        // Form Submit Event Listeners
+        document.getElementById('form-remision').addEventListener('submit', (e) => {
             e.preventDefault();
-            try {
-                const fotoFile = document.getElementById('rem-foto').files[0];
-                const fotoBase64 = await compressAndGetBase64(fotoFile);
-
-                const item = {
-                    id: Date.now(),
-                    unidad: document.getElementById('rem-unidad').value,
-                    conductor: document.getElementById('rem-conductor').value,
-                    detalle: document.getElementById('rem-detalle').value,
-                    foto: fotoBase64,
-                    fecha: new Date().toLocaleString('es-MX')
-                };
-
-                const data = JSON.parse(localStorage.getItem(STORAGE_REM) || '[]');
-                data.unshift(item);
-                localStorage.setItem(STORAGE_REM, JSON.stringify(data));
-                e.target.reset();
-                renderRemisiones();
-            } catch (err) {
-                alert('Error de almacenamiento. Intente sin foto o borre registros antiguos.');
-            }
+            const data = getDB('db_remisiones');
+            data.unshift({ folio: document.getElementById('rem-folio').value, cliente: document.getElementById('rem-cliente').value, concepto: document.getElementById('rem-concepto').value });
+            setDB('db_remisiones', data);
+            e.target.reset();
+            renderAll();
         });
 
-        // Mantenimiento Submit
+        document.getElementById('form-cartaporte').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const data = getDB('db_cartaporte');
+            data.unshift({ origen: document.getElementById('cp-origen').value, destino: document.getElementById('cp-destino').value, mercancia: document.getElementById('cp-mercancia').value });
+            setDB('db_cartaporte', data);
+            e.target.reset();
+            renderAll();
+        });
+
+        document.getElementById('form-pendientes').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const data = getDB('db_pendientes');
+            data.unshift({ tarea: document.getElementById('pen-tarea').value, prioridad: document.getElementById('pen-prioridad').value });
+            setDB('db_pendientes', data);
+            e.target.reset();
+            renderAll();
+        });
+
+        document.getElementById('form-compras').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const data = getDB('db_compras');
+            data.unshift({ item: document.getElementById('com-item').value, monto: document.getElementById('com-monto').value });
+            setDB('db_compras', data);
+            e.target.reset();
+            renderAll();
+        });
+
+        document.getElementById('form-imagenes').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const photo = await compressPhoto(document.getElementById('img-archivo').files[0]);
+            const data = getDB('db_imagenes');
+            data.unshift({ titulo: document.getElementById('img-titulo').value, img: photo });
+            setDB('db_imagenes', data);
+            e.target.reset();
+            renderAll();
+        });
+
+        document.getElementById('form-camiones').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const data = getDB('db_camiones');
+            data.unshift({ num: document.getElementById('cam-num').value, placas: document.getElementById('cam-placas').value, modelo: document.getElementById('cam-modelo').value });
+            setDB('db_camiones', data);
+            e.target.reset();
+            renderAll();
+        });
+
+        document.getElementById('form-choferes').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const data = getDB('db_choferes');
+            data.unshift({ nombre: document.getElementById('chof-nombre').value, licencia: document.getElementById('chof-licencia').value, tel: document.getElementById('chof-tel').value });
+            setDB('db_choferes', data);
+            e.target.reset();
+            renderAll();
+        });
+
         document.getElementById('form-mantenimiento').addEventListener('submit', (e) => {
             e.preventDefault();
-            const item = {
-                id: Date.now(),
-                unidad: document.getElementById('mant-unidad').value,
-                tipo: document.getElementById('mant-tipo').value,
-                costo: document.getElementById('mant-costo').value || '0',
-                desc: document.getElementById('mant-desc').value,
-                fecha: new Date().toLocaleDateString('es-MX')
-            };
-
-            const data = JSON.parse(localStorage.getItem(STORAGE_MANT) || '[]');
-            data.unshift(item);
-            localStorage.setItem(STORAGE_MANT, JSON.stringify(data));
+            const data = getDB('db_mantenimiento');
+            data.unshift({ camion: document.getElementById('mant-camion').value, falla: document.getElementById('mant-falla').value });
+            setDB('db_mantenimiento', data);
             e.target.reset();
-            renderMantenimientos();
+            renderAll();
         });
 
-        // Inventario Submit
-        document.getElementById('form-inventario').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const item = {
-                id: Date.now(),
-                nombre: document.getElementById('inv-nombre').value,
-                cant: document.getElementById('inv-cant').value,
-                estado: document.getElementById('inv-estado').value
-            };
+        // Render Functions
+        function renderAll() {
+            // Dashboard Counts
+            document.getElementById('dash-camiones').innerText = getDB('db_camiones').length;
+            document.getElementById('dash-choferes').innerText = getDB('db_choferes').length;
+            document.getElementById('dash-pendientes').innerText = getDB('db_pendientes').length;
+            document.getElementById('dash-remisiones').innerText = getDB('db_remisiones').length;
 
-            const data = JSON.parse(localStorage.getItem(STORAGE_INV) || '[]');
-            data.unshift(item);
-            localStorage.setItem(STORAGE_INV, JSON.stringify(data));
-            e.target.reset();
-            renderInventario();
-        });
-
-        // Renderers
-        function renderRemisiones() {
-            const data = JSON.parse(localStorage.getItem(STORAGE_REM) || '[]');
-            const container = document.getElementById('lista-remisiones');
-            container.innerHTML = data.length === 0 ? '<p class="text-xs text-slate-500 italic">No hay remisiones registradas.</p>' : '';
-            
-            data.forEach(item => {
-                container.innerHTML += `
-                    <div class="bg-slate-800 border border-slate-700 p-3 rounded-lg text-xs space-y-2">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <span class="font-bold text-blue-400 text-sm">${item.unidad}</span>
-                                <p class="text-slate-300">Chofer: ${item.conductor}</p>
-                            </div>
-                            <span class="text-slate-500">${item.fecha}</span>
-                        </div>
-                        <p class="text-slate-400">${item.detalle}</p>
-                        ${item.foto ? `<img src="${item.foto}" class="w-full h-32 object-cover rounded-md border border-slate-700 mt-2">` : ''}
-                    </div>
-                `;
-            });
+            // Lists
+            document.getElementById('lista-remision').innerHTML = getDB('db_remisiones').map(i => `<div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs"><p class="font-bold text-blue-400">Folio: ${i.folio}</p><p>Cliente: ${i.cliente}</p><p class="text-slate-400">${i.concepto}</p></div>`).join('');
+            document.getElementById('lista-cartaporte').innerHTML = getDB('db_cartaporte').map(i => `<div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs"><p class="font-bold text-purple-400">${i.origen} ➔ ${i.destino}</p><p class="text-slate-400">Mercancía: ${i.mercancia}</p></div>`).join('');
+            document.getElementById('lista-pendientes').innerHTML = getDB('db_pendientes').map(i => `<div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs flex justify-between"><span>${i.tarea}</span><span class="text-amber-400 font-bold">${i.prioridad}</span></div>`).join('');
+            document.getElementById('lista-compras').innerHTML = getDB('db_compras').map(i => `<div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs flex justify-between"><span>${i.item}</span><span class="text-emerald-400 font-bold">$${i.monto}</span></div>`).join('');
+            document.getElementById('lista-imagenes').innerHTML = getDB('db_imagenes').map(i => `<div class="bg-slate-800 p-2 rounded-lg border border-slate-700 text-xs"><p class="font-bold mb-1 truncate">${i.titulo}</p>${i.img ? `<img src="${i.img}" class="w-full h-24 object-cover rounded">` : ''}</div>`).join('');
+            document.getElementById('lista-camiones').innerHTML = getDB('db_camiones').map(i => `<div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs"><p class="font-bold text-cyan-400">Eco: ${i.num}</p><p>Placas: ${i.placas} | Modelo: ${i.modelo}</p></div>`).join('');
+            document.getElementById('lista-choferes').innerHTML = getDB('db_choferes').map(i => `<div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs"><p class="font-bold text-indigo-400">${i.nombre}</p><p>Licencia: ${i.licencia} | Tel: ${i.tel}</p></div>`).join('');
+            document.getElementById('lista-mantenimiento').innerHTML = getDB('db_mantenimiento').map(i => `<div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-xs"><p class="font-bold text-red-400">Unidad: ${i.camion}</p><p class="text-slate-400">${i.falla}</p></div>`).join('');
         }
 
-        function renderMantenimientos() {
-            const data = JSON.parse(localStorage.getItem(STORAGE_MANT) || '[]');
-            const container = document.getElementById('lista-mantenimientos');
-            container.innerHTML = data.length === 0 ? '<p class="text-xs text-slate-500 italic">Sin mantenimientos registrados.</p>' : '';
-            
-            data.forEach(item => {
-                container.innerHTML += `
-                    <div class="bg-slate-800 border border-slate-700 p-3 rounded-lg text-xs space-y-1">
-                        <div class="flex justify-between">
-                            <span class="font-bold text-amber-400 text-sm">${item.unidad}</span>
-                            <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">${item.tipo}</span>
-                        </div>
-                        <p class="text-slate-300">${item.desc}</p>
-                        <div class="flex justify-between text-slate-500 pt-1">
-                            <span>Costo: $${item.costo}</span>
-                            <span>${item.fecha}</span>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function renderInventario() {
-            const data = JSON.parse(localStorage.getItem(STORAGE_INV) || '[]');
-            const container = document.getElementById('lista-inventario');
-            container.innerHTML = data.length === 0 ? '<p class="text-xs text-slate-500 italic">Inventario vacío.</p>' : '';
-            
-            data.forEach(item => {
-                container.innerHTML += `
-                    <div class="bg-slate-800 border border-slate-700 p-3 rounded-lg text-xs flex justify-between items-center">
-                        <div>
-                            <span class="font-bold text-emerald-400 text-sm">${item.nombre}</span>
-                            <p class="text-slate-400">Estado: ${item.estado}</p>
-                        </div>
-                        <span class="text-base font-bold bg-slate-900 px-3 py-1 rounded-lg border border-slate-700 text-slate-200">x${item.cant}</span>
-                    </div>
-                `;
-            });
-        }
-
-        // Init
-        renderRemisiones();
-        renderMantenimientos();
-        renderInventario();
+        renderAll();
     </script>
 </body>
 </html>
